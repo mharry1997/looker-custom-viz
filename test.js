@@ -105,13 +105,20 @@ const visObject = {
                 .metric-container {
                     display: flex;
                     flex-direction: column;
-                    justify-content: center;
+                    justify-content: space-between;
                     align-items: center;
                     height: 100%;
+                    width: 100%;
                     font-family: 'Roboto', 'Google Sans', sans-serif;
-                    padding: 20px;
+                    padding: 10px 10px 5px 10px;
                     box-sizing: border-box;
-                    border: 2px solid #ccc;
+                }
+                .metric-content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    flex: 1;
                 }
                 .metric-value {
                     font-weight: 500;
@@ -120,11 +127,10 @@ const visObject = {
                 }
                 .metric-label {
                     color: #5f6368;
-                    margin: 10px 0 20px 0;
+                    margin-top: 15px;
                 }
                 .progress-container {
                     width: 100%;
-                    max-width: 400px;
                 }
                 .progress-bar-bg {
                     width: 100%;
@@ -148,8 +154,10 @@ const visObject = {
                 }
             </style>
             <div class="metric-container">
-                <div class="metric-value"></div>
-                <div class="metric-label"></div>
+                <div class="metric-content">
+                    <div class="metric-value"></div>
+                    <div class="metric-label"></div>
+                </div>
                 <div class="progress-container">
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill"></div>
@@ -161,10 +169,14 @@ const visObject = {
     },
 
     updateAsync: function(data, element, config, queryResponse, details, doneRendering) {
-        // Calculate responsive sizing based on container
+        // Calculate responsive sizing based on tile dimensions
         var containerHeight = element.offsetHeight;
         var containerWidth = element.offsetWidth;
-        var baseSize = Math.min(containerWidth / 15, containerHeight / 8);
+
+        // Define sizes as percentages of container
+        var metricValueSize = containerHeight * 0.25;  // 25% of tile height
+        var progressBarHeight = containerHeight * 0.1;  // 10% of tile height
+        var labelSize = progressBarHeight * 0.5;  // Half the progress bar height
 
         // Get all fields
         var fields = queryResponse.fields.dimensions.map(field => field.name)
@@ -237,13 +249,13 @@ const visObject = {
         var veryLightBarColor = lightenColor(barColor, 0.92);  // 92% lighter for unfilled portion
 
         // Apply responsive sizing
-        metricValueElement.style.fontSize = (baseSize * 1.5) + 'px';
-        metricLabelElement.style.fontSize = (baseSize * 0.45) + 'px';
-        benchmarkLabelElement.style.fontSize = (baseSize * 0.35) + 'px';
+        metricValueElement.style.fontSize = metricValueSize + 'px';
+        metricLabelElement.style.fontSize = labelSize + 'px';
+        benchmarkLabelElement.style.fontSize = labelSize + 'px';
 
         // Update progress bar height
         var progressBarBg = element.querySelector('.progress-bar-bg');
-        progressBarBg.style.height = (baseSize * 0.9) + 'px';
+        progressBarBg.style.height = progressBarHeight + 'px';
 
         metricValueElement.textContent = formattedMetricValue;
         metricValueElement.style.color = barColor;  // Exact color
