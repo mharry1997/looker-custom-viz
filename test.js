@@ -157,15 +157,10 @@ const visObject = {
     },
 
     updateAsync: function(data, element, config, queryResponse, details, doneRendering) {
-        // Clear any errors
-        this.clearErrors();
-
         // Validate we have data
         if (!data || data.length === 0) {
-            this.addError({
-                title: 'No Data',
-                message: 'No data available to display.'
-            });
+            element.innerHTML = '<div style="text-align: center; padding: 20px;">No data available</div>';
+            doneRendering();
             return;
         }
 
@@ -176,10 +171,8 @@ const visObject = {
 
         // Validate we have at least 2 fields (metric and benchmark)
         if (fields.length < 2) {
-            this.addError({
-                title: 'Insufficient Fields',
-                message: 'This visualization requires at least 2 fields: a metric value and a benchmark value.'
-            });
+            element.innerHTML = '<div style="text-align: center; padding: 20px;">Need at least 2 fields (metric and benchmark)</div>';
+            doneRendering();
             return;
         }
 
@@ -191,10 +184,8 @@ const visObject = {
 
         // Validate fields exist in data
         if (!rowData[metricField] || !rowData[benchmarkField]) {
-            this.addError({
-                title: 'Field Not Found',
-                message: 'Could not find metric or benchmark field in data. Available fields: ' + Object.keys(rowData).join(', ')
-            });
+            element.innerHTML = '<div style="text-align: center; padding: 20px;">Fields not found. Available: ' + Object.keys(rowData).join(', ') + '</div>';
+            doneRendering();
             return;
         }
 
