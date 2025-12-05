@@ -157,8 +157,12 @@ const visObject = {
     },
 
     updateAsync: function(data, element, config, queryResponse, details, doneRendering) {
+        console.log('Metric Progress Bar - Data received:', data);
+        console.log('Metric Progress Bar - Query Response:', queryResponse);
+
         // Validate we have data
         if (!data || data.length === 0) {
+            console.log('No data available');
             element.innerHTML = '<div style="text-align: center; padding: 20px;">No data available</div>';
             doneRendering();
             return;
@@ -169,6 +173,8 @@ const visObject = {
             .concat(queryResponse.fields.measures.map(field => field.name))
             .concat(queryResponse.fields.table_calculations.map(field => field.name));
 
+        console.log('Fields found:', fields);
+
         // Validate we have at least 2 fields (metric and benchmark)
         if (fields.length < 2) {
             element.innerHTML = '<div style="text-align: center; padding: 20px;">Need at least 2 fields (metric and benchmark)</div>';
@@ -177,13 +183,16 @@ const visObject = {
         }
 
         var rowData = data[0];
+        console.log('Row data:', rowData);
 
         // Get metric and benchmark fields
         var metricField = fields[0];
         var benchmarkField = fields[1];
+        console.log('Metric field:', metricField, 'Benchmark field:', benchmarkField);
 
         // Validate fields exist in data
         if (!rowData[metricField] || !rowData[benchmarkField]) {
+            console.log('Field validation failed. rowData keys:', Object.keys(rowData));
             element.innerHTML = '<div style="text-align: center; padding: 20px;">Fields not found. Available: ' + Object.keys(rowData).join(', ') + '</div>';
             doneRendering();
             return;
@@ -250,6 +259,7 @@ const visObject = {
 
         benchmarkLabelElement.textContent = benchmarkLabel + ': ' + formattedBenchmarkValue;
 
+        console.log('Rendering complete! Metric:', formattedMetricValue, 'Progress:', progressPercent + '%', 'Color:', barColor);
         doneRendering();
     }
 };
