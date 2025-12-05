@@ -3,6 +3,8 @@
  * Displays a single metric value with a progress bar showing progress towards a benchmark
  **/
 
+console.log('Metric Progress Bar - File loaded');
+
 function extractNumber(str) {
     var regex = /(\d+)$/;
     var matches = regex.exec(str);
@@ -96,6 +98,7 @@ const visObject = {
     },
 
     create: function(element, config) {
+        console.log('Metric Progress Bar - CREATE function called');
         element.innerHTML = `
             <style>
                 .metric-container {
@@ -264,4 +267,6 @@ const visObject = {
     }
 };
 
+console.log('Metric Progress Bar - Registering visualization');
 looker.plugins.visualizations.add(visObject);
+console.log('Metric Progress Bar - Visualization registered');
