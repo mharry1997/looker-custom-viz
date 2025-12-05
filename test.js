@@ -1,9 +1,6 @@
 /**
  * Metric with Progress Bar Visualization
- * Displays a single metric value with a progress bar showing progress towards a benchmark
  **/
-
-console.log('Metric Progress Bar - File loaded');
 
 function extractNumber(str) {
     var regex = /(\d+)$/;
@@ -98,119 +95,30 @@ const visObject = {
     },
 
     create: function(element, config) {
-        console.log('Metric Progress Bar - CREATE function called');
-        element.innerHTML = `
-            <style>
-                .metric-container {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100%;
-                    font-family: 'Roboto', 'Google Sans', sans-serif;
-                    padding: 20px;
-                    box-sizing: border-box;
-                }
-                .metric-value {
-                    font-size: 4em;
-                    font-weight: 500;
-                    margin: 0;
-                    line-height: 1;
-                }
-                .metric-label {
-                    font-size: 1.2em;
-                    color: #5f6368;
-                    margin: 10px 0 20px 0;
-                }
-                .progress-container {
-                    width: 100%;
-                    max-width: 400px;
-                }
-                .progress-bar-bg {
-                    width: 100%;
-                    height: 30px;
-                    background-color: #e8eaed;
-                    border-radius: 15px;
-                    overflow: hidden;
-                    position: relative;
-                }
-                .progress-bar-fill {
-                    height: 100%;
-                    transition: width 0.3s ease;
-                    border-radius: 15px;
-                }
-                .benchmark-label {
-                    font-size: 0.9em;
-                    color: #5f6368;
-                    margin-top: 8px;
-                    text-align: center;
-                }
-            </style>
-            <div class="metric-container">
-                <div class="metric-value"></div>
-                <div class="metric-label"></div>
-                <div class="progress-container">
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                    <div class="benchmark-label"></div>
-                </div>
-            </div>
-        `;
+        element.innerHTML = "<h1>Ready to render!</h1>";
     },
 
     updateAsync: function(data, element, config, queryResponse, details, doneRendering) {
-        console.log('Metric Progress Bar - Data received:', data);
-        console.log('Metric Progress Bar - Query Response:', queryResponse);
+        // Clear existing content
+        element.innerHTML = "";
 
-        // Validate we have data
-        if (!data || data.length === 0) {
-            console.log('No data available');
-            element.innerHTML = '<div style="text-align: center; padding: 20px;">No data available</div>';
-            doneRendering();
-            return;
-        }
+        var container = document.createElement("div");
+        container.style.fontFamily = "'Roboto', sans-serif";
+        container.style.display = "flex";
+        container.style.flexDirection = "column";
+        container.style.justifyContent = "center";
+        container.style.alignItems = "center";
+        container.style.height = "100%";
+        container.style.padding = "20px";
 
-        // Get all fields
+        var rowData = data[0];
         var fields = queryResponse.fields.dimensions.map(field => field.name)
             .concat(queryResponse.fields.measures.map(field => field.name))
             .concat(queryResponse.fields.table_calculations.map(field => field.name));
 
-        console.log('Fields found:', fields);
-
-        // Validate we have at least 2 fields (metric and benchmark)
-        if (fields.length < 2) {
-            element.innerHTML = '<div style="text-align: center; padding: 20px;">Need at least 2 fields (metric and benchmark)</div>';
-            doneRendering();
-            return;
-        }
-
-        var rowData = data[0];
-        console.log('Row data:', rowData);
-
         // Get metric and benchmark fields
         var metricField = fields[0];
         var benchmarkField = fields[1];
-        console.log('Metric field:', metricField, 'Benchmark field:', benchmarkField);
-
-        // Validate fields exist in data
-        if (!rowData[metricField] || !rowData[benchmarkField]) {
-            console.log('Field validation failed. rowData keys:', Object.keys(rowData));
-            element.innerHTML = '<div style="text-align: center; padding: 20px;">Fields not found. Available: ' + Object.keys(rowData).join(', ') + '</div>';
-            doneRendering();
-            return;
-        }
-
-        // Get field labels
-        var metricFieldDef = queryResponse.fields.dimensions.find(f => f.name === metricField) ||
-                            queryResponse.fields.measures.find(f => f.name === metricField) ||
-                            queryResponse.fields.table_calculations.find(f => f.name === metricField);
-        var benchmarkFieldDef = queryResponse.fields.dimensions.find(f => f.name === benchmarkField) ||
-                               queryResponse.fields.measures.find(f => f.name === benchmarkField) ||
-                               queryResponse.fields.table_calculations.find(f => f.name === benchmarkField);
-
-        var metricLabel = metricFieldDef ? metricFieldDef.label_short || metricFieldDef.label : metricField;
-        var benchmarkLabel = benchmarkFieldDef ? benchmarkFieldDef.label_short || benchmarkFieldDef.label : benchmarkField;
 
         // Parse values
         var metricValue = parseFloat(rowData[metricField].value);
@@ -247,26 +155,62 @@ const visObject = {
             formattedBenchmarkValue = (benchmarkValue * 100).toFixed(extractNumber(benchmarkFormat)) + '%';
         }
 
-        // Update DOM
-        var metricValueElement = element.querySelector('.metric-value');
-        var metricLabelElement = element.querySelector('.metric-label');
-        var progressBarFill = element.querySelector('.progress-bar-fill');
-        var benchmarkLabelElement = element.querySelector('.benchmark-label');
+        // Create metric value
+        var metricValueDiv = document.createElement("div");
+        metricValueDiv.style.fontSize = "4em";
+        metricValueDiv.style.fontWeight = "500";
+        metricValueDiv.style.color = config.metricColor;
+        metricValueDiv.style.margin = "0";
+        metricValueDiv.textContent = formattedMetricValue;
 
-        metricValueElement.textContent = formattedMetricValue;
-        metricValueElement.style.color = config.metricColor;
-        metricLabelElement.textContent = metricLabel;
+        // Create metric label
+        var metricLabelDiv = document.createElement("div");
+        metricLabelDiv.style.fontSize = "1.2em";
+        metricLabelDiv.style.color = "#5f6368";
+        metricLabelDiv.style.marginTop = "10px";
+        metricLabelDiv.style.marginBottom = "20px";
+        metricLabelDiv.textContent = queryResponse.fields.measures[0].label_short || queryResponse.fields.measures[0].label;
 
-        progressBarFill.style.width = Math.min(progressPercent, 100) + '%';
+        // Create progress bar container
+        var progressContainer = document.createElement("div");
+        progressContainer.style.width = "100%";
+        progressContainer.style.maxWidth = "400px";
+
+        var progressBarBg = document.createElement("div");
+        progressBarBg.style.width = "100%";
+        progressBarBg.style.height = "30px";
+        progressBarBg.style.backgroundColor = "#e8eaed";
+        progressBarBg.style.borderRadius = "15px";
+        progressBarBg.style.overflow = "hidden";
+
+        var progressBarFill = document.createElement("div");
+        progressBarFill.style.height = "100%";
+        progressBarFill.style.width = Math.min(progressPercent, 100) + "%";
         progressBarFill.style.backgroundColor = barColor;
+        progressBarFill.style.borderRadius = "15px";
+        progressBarFill.style.transition = "width 0.3s ease";
 
-        benchmarkLabelElement.textContent = benchmarkLabel + ': ' + formattedBenchmarkValue;
+        // Create benchmark label
+        var benchmarkLabelDiv = document.createElement("div");
+        benchmarkLabelDiv.style.fontSize = "0.9em";
+        benchmarkLabelDiv.style.color = "#5f6368";
+        benchmarkLabelDiv.style.marginTop = "8px";
+        benchmarkLabelDiv.style.textAlign = "center";
+        var benchmarkFieldLabel = queryResponse.fields.measures[1] ? (queryResponse.fields.measures[1].label_short || queryResponse.fields.measures[1].label) : "Benchmark";
+        benchmarkLabelDiv.textContent = benchmarkFieldLabel + ': ' + formattedBenchmarkValue;
 
-        console.log('Rendering complete! Metric:', formattedMetricValue, 'Progress:', progressPercent + '%', 'Color:', barColor);
+        // Append elements
+        progressBarBg.appendChild(progressBarFill);
+        progressContainer.appendChild(progressBarBg);
+        progressContainer.appendChild(benchmarkLabelDiv);
+
+        container.appendChild(metricValueDiv);
+        container.appendChild(metricLabelDiv);
+        container.appendChild(progressContainer);
+
+        element.appendChild(container);
         doneRendering();
     }
 };
 
-console.log('Metric Progress Bar - Registering visualization');
 looker.plugins.visualizations.add(visObject);
-console.log('Metric Progress Bar - Visualization registered');
